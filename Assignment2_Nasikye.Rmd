@@ -1,0 +1,381 @@
+---
+title: "Assignment2_Nasikye"
+author: "Nasikye Maria Cynthia B27013"
+date: "2025-09-28"
+output: pdf_document
+---
+
+Installing packages
+```{r}
+install.packages("DBI")
+install.packages("dbpylr")
+install.packages("odbc")
+install.packages("tidyverse")
+install.packages("duckdb")
+```
+
+Calling the libraries
+```{r}
+library(DBI)
+library(dbplyr)
+library(odbc)
+library(tidyverse)
+library(duckdb)
+
+```
+
+QN.1  Create your own directory in an in-directory data base management system and label it "Assignment2." [10 MARKS]
+#i. Create a duckdb server and connect to it
+```{r}
+con = DBI::dbConnect(duckdb::duckdb(), dbdir = "Assignment2")
+con <- DBI::dbConnect(duckdb::duckdb())
+
+```
+
+QN.2 To the directory, add up to 10 datasets sourced from the World Bank Data Repository on Digital Data that include Uganda.[10 marks]
+# Load data from World Bank Data Repository to Assignment2
+```{r}
+#Dataset1
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/WB_FINDEX.csv",name = "data1")
+#Dataset2
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/UNCTAD_DE.csv",name = "data2")
+#Dataset3
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/UN_EGDI.csv",name = "data3")
+#Dataset4
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/ILO_EMP.csv",name = "data4")
+#Dataset5
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/ITU_GCI.csv",name = "data5")
+#Dataset6
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/GDIP_DVC.csv",name = "data6")
+#Dataset7
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/PCH_IXP.csv",name = "data7")
+#Dataset8
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/ITU_ICT.csv",name = "data8")
+#Datset9
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/ITU_DH.csv",name = "data9")
+#Dataset10
+duckdb_read_csv(con,files = "C:/Users/ADMIN/Downloads/UNESCO_UIS.csv",name = "data10")
+
+
+```
+
+QN.3 Write code illustrating that all 10 datasets are within your directory "Assignment2".[10 marks]
+```{r}
+#List tables in directory
+dbListTables(con)
+
+```
+
+QN.4 Mine the datasets for missing data.[10 marks]
+```{r}
+#Load each dataset and check for missing values
+data1 <- dbGetQuery(con, "SELECT * FROM data1")
+data1
+missing1 <- sum(is.na(data1))
+
+data2 <- dbGetQuery(con, "SELECT * FROM data2")
+data2
+missing2 <- sum(is.na(data2))
+missing2
+
+data3 <- dbGetQuery(con, "SELECT * FROM data3")
+data3
+missing3 <- sum(is.na(data3))
+
+data4 <- dbGetQuery(con, "SELECT * FROM data4")
+data4
+missing4 <- sum(is.na(data4))
+
+data5 <- dbGetQuery(con, "SELECT * FROM data5")
+data5
+missing5 <- sum(is.na(data5))
+
+data6 <- dbGetQuery(con, "SELECT * FROM data6")
+data6
+missing6 <- sum(is.na(data6))
+
+data7 <- dbGetQuery(con, "SELECT * FROM data7")
+data7
+missing7 <- sum(is.na(data7))
+
+data8 <- dbGetQuery(con, "SELECT * FROM data8")
+data8
+missing8 <- sum(is.na(data8))
+
+data9 <- dbGetQuery(con, "SELECT * FROM data9")
+data9
+missing9 <- sum(is.na(data9))
+
+data10 <- dbGetQuery(con, "SELECT * FROM data10")
+data10
+missing10 <- sum(is.na(data10))
+```
+#data1 has 402715 missing values, data2 has 465 missing values, data3 has no missing values, data4 has 678 missing values, data5 has no missing values, data6 has 14 missing values, data7 has no missing values, data8 has no missing values, data9 has 339 missing values, data10 has no missing values
+
+
+QN.5 Generate the descriptive statistics of one variable from each of the 10 datasets.[30 marks]
+```{r}
+#####Dataset 1##########################################
+#View structure of the dataset
+str(data1)
+#generate statistic of REF_AREA_LABEL
+summary(data1$REF_AREA_LABEL)
+data1_stats <- table(data1$REF_AREA_LABEL)
+data1_stats
+#Get the mode for data1
+getmode = function(v) {
+  uniqv = unique(v) 
+  uniqv[which.max(tabulate(match(v, uniqv)))]}
+
+v = data1$REF_AREA_LABEL
+data1_mode = getmode(v)
+data1_mode
+#The most  frequent area is Bangladesh
+```
+
+```{r}
+######Dataset2####################################
+#View data structure of the dataset
+str(data2)
+#Generate statistics of OBS_VALUE
+summary(data2$OBS_VALUE)
+#Finding the mode
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+v = data2$`OBS_VALUE`
+data2_mode = getmode(v)
+data2_mode
+#The minimum value of OBS_VALUE is 1, the maximum number is 4462457, the first quartile is 44, the third quartile is 1864, the median is 120, the mean is 20046 and there are 465 missing values.
+#The mean is greater than the median showing a positive skew.
+```
+```{r}
+###Dataset3#######################
+#View the structure of data3
+str(data3)
+#Generate the statistics of REF_AREA_LABEL
+summary(data3$REF_AREA_LABEL)
+#Get the mode for REF_AREA_LABEL
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+v = data3$REF_AREA_LABEL
+refarea_mode = getmode(v)
+refarea_mode
+#The most frequent Ref area label is Liechtenstein
+```
+```{r}
+#Dataset4########################
+#View the dataset structure
+str(data4)
+#generate the statistics
+summary(data4$OBS_STATUS_LABEL)
+#Get mode
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+v = data4$OBS_STATUS_LABEL
+data4_mode = getmode(v)
+data4_mode
+#The most frequent OBS_STATUS_LEVEL is normal value.
+```
+```{r}
+##Dataset 5
+#View data structure
+str(data5)
+#generate statistics
+summary(data5$OBS_VALUE)
+#get mode
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v,uniqv)))]
+}
+
+v = data5$OBS_VALUE
+data5_mode = getmode(v)
+data5_mode
+#The minimum value is 0.000, the maximum value is 100.000, the first quartile is 0.000, the third quartile is 1.000, the median is 1.000, the mean is 5.042.
+#The mean is greater than the median therefore positively skewed.
+```
+```{r}
+##Dataset 6
+#View the data structure
+str(data6)
+#generate statistics
+summary(data6$OBS_STATUS_LABEL)
+#get mode
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v,uniqv)))]
+}
+
+v = data6$OBS_STATUS_LABEL
+data5_mode = getmode(v)
+data5_mode
+#OBS_STATUS_LABEL has 192 values and Normal value is the most frequent.
+```
+
+```{r}
+#dataset 7
+#View data structure
+str(data7)
+#generate statistics
+summary(data7$OBS_VALUE)
+#get mode
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v,uniqv)))]
+}
+
+v = data7$OBS_VALUE
+data7_mode = getmode(v)
+data7_mode
+#The mininum OBS_VALUE is 1.00, the maximum is 751.0, the 1st quartile is 3.00, the 3rd quartile is 21.25, the median is 10.00, the the mean is 26.58
+#The OBS_VALUE has it's mean greater than the median and is therefore not normally distributed.
+#The most frequent value is 1
+```
+```{r}
+#dataset 8
+#view data structure
+str(data8)
+#generate statistics
+summary(data8$OBS_VALUE)
+#get mode
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v,uniqv)))]
+}
+
+v = data8$OBS_VALUE
+data8_mode = getmode(v)
+data8_mode
+#The mininum value is 0.00, the 1st quartile is 12.00, the median is 17.50, the mean is 24.02, the 3rd quartile is 25.33, the maximum  number si 100.00
+#The mean is greater than median therefore OBS_VALUE is positively skewed.
+#The most frequent value is 18
+```
+```{r}
+#dataset 9
+#view data structure
+str(data9$FREQ)
+#generate statistics
+summary(data9$FREQ)
+#get mode
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v,uniqv)))]
+}
+
+v = data9$FREQ
+data9 = getmode(v)
+data9
+#The most frequent variable is A
+```
+```{r}
+#dataset 10
+#view data structure
+str(data10)
+#generate statistics
+summary(data10$INDICATOR)
+#get mode
+getmode = function(v){
+  uniqv = unique(v)
+  uniqv[which.max(tabulate(match(v,uniqv)))]
+}
+
+v = data10$INDICATOR
+data10_mode = getmode(v)
+data10_mode
+#The variable has 13435 values and the most frequent is UNESCO_UIS_GRAD_ICT
+```
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
